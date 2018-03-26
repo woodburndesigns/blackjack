@@ -3,13 +3,18 @@ import { createLogger } from 'redux-logger';
 import thunk from 'redux-thunk';
 import reducers from './reducers';
 
-const middleware = applyMiddleware(thunk, createLogger());
+let middleware = applyMiddleware(thunk, createLogger());
+
+if (window.__REDUX_DEVTOOLS_EXTENSION__) {
+  middleware = compose(
+    middleware,
+    window.__REDUX_DEVTOOLS_EXTENSION__()
+  )
+}
 
 const store = createStore(
   reducers,
-  compose(
-    middleware,
-    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
-));
+  middleware,
+);
 
 export default store;

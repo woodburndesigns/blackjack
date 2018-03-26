@@ -98,7 +98,9 @@ class Game extends React.Component {
   }
 
   renderDealerScore() {
-    const score = this.props.game.dealer.hand.length <= 2 ? '' : this.props.game.dealer.score
+    const game = this.props.game;
+    const stood = game.player.stand;
+    const score = stood ? game.dealer.score : '' ;
     
     return `Dealer: ${score}`;
   }
@@ -118,8 +120,10 @@ class Game extends React.Component {
     const hitDisabled = game.player.stand || gameDisabled;
     const standDisabled = gameDisabled;
     const newGameDisabled = !gameDisabled;
+    
     const dealerCards = this.renderDealerCards();
     const playerCards = this.renderPlayerCards();
+    
     const playerScore = this.renderPlayerScore();
     const dealerScore = this.renderDealerScore();
 

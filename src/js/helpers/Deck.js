@@ -12,7 +12,7 @@ class Deck {
       if (tens.indexOf(card) >= 0) {
         value = 10;
       } else if (card === 'A') {
-        value = [1, 11];
+        value = 11;
       } else {
         value = card;
       }
@@ -22,11 +22,9 @@ class Deck {
 
     suits.forEach(suit => {
       cards.forEach(card => {
-        this.deck.push({
-          card,
-          suit,
-          value: getValue(card),
-        });
+        const value = getValue(card);
+
+        this.deck.push({ card, suit, value });
       });
     });
   }

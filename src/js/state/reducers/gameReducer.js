@@ -12,19 +12,13 @@ const calculateScore = function(hand = []) {
   let score = 0;
 
   if (hand.length > 0) {
-    score = hand.reduce((acc, cur) => {
-      let curValue = cur.value;
-      
-      if (Array.isArray(curValue)) {
-        if ((curValue[1] + acc) <= MAX_HAND) {
-          curValue = curValue[1];
-        } else {
-          curValue = curValue[0];
-        }
-      }
-  
-      return acc + curValue;
-    }, 0);
+    let aceCount = hand.filter(h => (h.card === 'A')).length;
+    score = hand.reduce((acc, cur) => (acc + cur.value), 0);
+    
+    while (score > MAX_HAND && aceCount > 0) {
+      score -= 10;
+      aceCount -= 1;
+    }
   }
 
   return score;
@@ -100,13 +94,6 @@ const gameReducer = (state = initialState, action) => {
 
       game.finished_at = new Date();
       break;
-    }
-    case 'GAME_UPDATE_SCORE': {
-      state = clone(state);
-      const { gameId } = action.payload;
-      const game = state.games[gameId];
-
-      
     }
     default:
   }

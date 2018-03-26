@@ -1,5 +1,17 @@
+import { PLAYER, DEALER } from "../../constants";
+
 export function createGame() {
-  return { type: 'GAME_CREATE' }
+  return (dispatch, getState) => {
+    dispatch({ type: 'GAME_CREATE' });
+
+    const state = getState();
+    const gameId = state.game.activeGame;
+
+    dispatch({ type: 'GAME_HIT', payload: { gameId, who: PLAYER } });
+    dispatch({ type: 'GAME_HIT', payload: { gameId, who: DEALER } });
+    dispatch({ type: 'GAME_HIT', payload: { gameId, who: PLAYER } });
+    dispatch({ type: 'GAME_HIT', payload: { gameId, who: DEALER } });
+  }
 }
 
 export function hit(gameId, who) {

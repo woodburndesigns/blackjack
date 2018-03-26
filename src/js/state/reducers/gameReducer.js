@@ -41,22 +41,12 @@ const gameReducer = (state = initialState, action) => {
           score: 0,
           stand: false,
         },
+        status: null,
         created_at: new Date(),
         finished_at: null,
       };
 
       state.games[game.id] = game;
-
-      game.player.hand.push(state.deck.deal());
-      game.dealer.hand.push(state.deck.deal());
-      game.player.hand.push(state.deck.deal());
-      game.dealer.hand.push(state.deck.deal());
-
-      game.player.score = calculateScore(game.player.hand);
-      game.dealer.score = calculateScore(game.dealer.hand);
-
-      state.games[game.id] = game;
-
       state.activeGame = game.id;
       break;
     }

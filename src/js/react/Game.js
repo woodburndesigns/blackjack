@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Button, Card } from 'semantic-ui-react';
-import { createGame, hit, stand } from '../state/actions/gameActions';
-import { DEALER, PLAYER } from '../constants';
+import { createGame, hit, stand, bust, win } from '../state/actions/gameActions';
+import { DEALER, PLAYER, DEALER_MIN_HAND, MAX_HAND } from '../constants';
 
 const mapStateToProps = (state, props) => {
   const game = state.game.games[state.game.activeGame];
@@ -18,6 +18,7 @@ class Game extends React.Component {
 
     this.onHit = this.onHit.bind(this);
     this.onStand = this.onStand.bind(this);
+    this.onNewGame = this.onNewGame.bind(this);
   }
 
   componentWillMount() {
@@ -25,10 +26,33 @@ class Game extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    const dispatch = nextProps.dispatch;
     const game = nextProps.game;
 
-    if (game && game.player.stand && game.dealer.score < 21) {
-      this.props.dispatch(hit(game.id, DEALER));
+    if (game && !game.finished_at) {
+      const stood = game.player.stand;
+      const dealerScore = game.dealer.score;
+      const playerScore = game.player.score;
+
+      // If either the player or dealer busted then stop the game now
+      if (playerScore > MAX_HAND || dealerScore > MAX_HAND) {
+        const who = playerScore > MAX_HAND ? PLAYER : DEALER;
+        dispatch(bust(game.id, who));
+
+      // If the player stood and the dealer's hand is less than 17 then dealer needs to hit
+      } else if (stood && dealerScore < DEALER_MIN_HAND) {
+        dispatch(hit(game.id, DEALER));
+      
+      // If the player stood and the dealer's hand is over 17 then we need to compare hands to see
+      // who wins
+      } else if (stood && dealerScore <= MAX_HAND) {
+        if (dealerScore === playerScore) {
+          // dispatch draw
+        } else {
+          const who = playerScore > dealerScore ? PLAYER : DEALER;
+          dispatch(win(game.id, who));
+        }
+      }
     }
   }
 
@@ -44,12 +68,25 @@ class Game extends React.Component {
     this.props.dispatch(stand(game.id));
   }
 
+  onNewGame() {
+    this.props.dispatch(createGame());
+  }
+
   renderDealerCards() {
-    return this.props.game.dealer.hand.map((card, index) => (
-      <Card key={ index }>
-        <Card.Content>{ card.card } of { card.suit }</Card.Content>
-      </Card>
-    ));
+    const game = this.props.game;
+    const hand = game.dealer.hand;
+    const stood = game.player.stand;
+    const cardCount = hand.length;
+
+    return hand.map((card, index) => {
+      const content = index === 1 && !stood ? 'Stand to view' : `${ card.card } of ${ card.suit }`;
+
+      return (
+        <Card key={ index }>
+          <Card.Content>{ content }</Card.Content>
+        </Card>
+      )
+    });
   }
 
   renderPlayerCards() {
@@ -60,8 +97,14 @@ class Game extends React.Component {
     ));
   }
 
+  renderDealerScore() {
+    const score = this.props.game.dealer.hand.length <= 2 ? '' : this.props.game.dealer.score
+    
+    return `Dealer: ${score}`;
+  }
+
   renderPlayerScore() {
-    return `Your score is: ${this.props.game.player.score}`;
+    return `You: ${this.props.game.player.score}`;
   }
 
   render() {
@@ -71,10 +114,14 @@ class Game extends React.Component {
       return null;
     }
 
-    const hitDisabled = game.player.stand;
+    const gameDisabled = game.finished_at ? true : false;
+    const hitDisabled = game.player.stand || gameDisabled;
+    const standDisabled = gameDisabled;
+    const newGameDisabled = !gameDisabled;
     const dealerCards = this.renderDealerCards();
     const playerCards = this.renderPlayerCards();
     const playerScore = this.renderPlayerScore();
+    const dealerScore = this.renderDealerScore();
 
     return (
       <div>
@@ -92,9 +139,13 @@ class Game extends React.Component {
         </div>
         <div>
           <Button onClick={ this.onHit } disabled={ hitDisabled }>Hit</Button>
-          <Button onClick={ this.onStand }>Stand</Button>
+          <Button onClick={ this.onStand } disabled={ standDisabled }>Stand</Button>
+          <Button onClick={ this.onNewGame } disabled={ newGameDisabled }>New Game</Button>
         </div>
-        { playerScore }
+        <ul>
+          <li>{ playerScore }</li>
+          <li>{ dealerScore }</li>
+        </ul>
       </div>
     )
   }

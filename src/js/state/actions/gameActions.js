@@ -1,16 +1,5 @@
-import api from '../../helpers/api';
-
-export function fetchGames() {
-  
-}
-
 export function createGame() {
-  const game = api.games.create();
-
-  return {
-    type: 'GAME_CREATE',
-    payload: { game }
-  }
+  return { type: 'GAME_CREATE' }
 }
 
 export function hit(gameId, who) {
@@ -19,8 +8,8 @@ export function hit(gameId, who) {
     payload: {
       gameId,
       who,
-    }
-  }
+    } 
+  };
 }
 
 export function stand(gameId) {
@@ -28,6 +17,26 @@ export function stand(gameId) {
     type: 'GAME_STAND',
     payload: {
       gameId,
+    }
+  }
+}
+
+export function bust(gameId, who) {
+  return {
+    type: 'GAME_BUST',
+    payload: {
+      gameId,
+      who,
+    }
+  }
+}
+
+export function win(gameId, who) {
+  return {
+    type: 'GAME_WIN',
+    payload: {
+      gameId,
+      who,
     }
   }
 }

@@ -1,6 +1,6 @@
 import clone from 'clone';
 import Deck from '../../helpers/Deck';
-import { MAX_HAND } from '../../constants';
+import { MAX_HAND, GAME_STATUS, PLAYER, DEALER_MIN_HAND } from '../../constants';
 
 const initialState = {
   activeGame: null,
@@ -8,7 +8,7 @@ const initialState = {
   games: {},
 };
 
-const calculateScore = function(hand = []) {
+const calculateScore = (hand = []) => {
   let score = 0;
 
   if (hand.length > 0) {
@@ -24,6 +24,31 @@ const calculateScore = function(hand = []) {
   return score;
 }
 
+const didBust = (score = 0) => {
+  return score > MAX_HAND;
+};
+
+const calculateStatus = (game) => {
+  let status = GAME_STATUS.playing;
+  const stood = game.player.stand;
+
+  if (didBust(game.player.score)) {
+    status = GAME_STATUS.lose;
+  } else if (didBust(game.dealer.score)) {
+    status = GAME_STATUS.win;
+  } else if (stood && game.dealer.score >= DEALER_MIN_HAND) {
+    if (game.player.score > game.dealer.score) {
+      status = GAME_STATUS.win;
+    } else if (game.player.score < game.dealer.score) {
+      status = GAME_STATUS.lose;
+    } else {
+      status = GAME_STATUS.draw;
+    }
+  }
+
+  return status;
+}
+
 const gameReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'GAME_CREATE': {
@@ -35,15 +60,16 @@ const gameReducer = (state = initialState, action) => {
         dealer: {
           hand: [],
           score: 0,
+          bust: false,
         },
         player: {
           hand: [],
           score: 0,
+          bust: false,
           stand: false,
         },
-        status: null,
+        status: GAME_STATUS.playing,
         created_at: new Date(),
-        finished_at: null,
       };
 
       state.games[game.id] = game;
@@ -58,31 +84,19 @@ const gameReducer = (state = initialState, action) => {
 
       game[who].hand.push(state.deck.deal());
       game[who].score = calculateScore(game[who].hand);
+      game[who].bust = didBust(game[who].score);
+      game.status = calculateStatus(game);
 
       break;
     }
     case 'GAME_STAND': {
       state = clone(state);
       const { gameId } = action.payload;
-
-      state.games[gameId].player.stand = true;
-      break;
-    }
-    case 'GAME_BUST': {
-      state = clone(state);
-      const { gameId, who } = action.payload;
       const game = state.games[gameId];
 
-      game.finished_at = new Date();
-      game[who].busted = true;
-      break;
-    }
-    case 'GAME_WIN': {
-      state = clone(state);
-      const { gameId } = action.payload;
-      const game = state.games[gameId];
-
-      game.finished_at = new Date();
+      game.player.stand = true;
+      game.status = calculateStatus(game);
+      
       break;
     }
     default:

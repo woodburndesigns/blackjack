@@ -32,23 +32,3 @@ export function stand(gameId) {
     }
   }
 }
-
-export function bust(gameId, who) {
-  return {
-    type: 'GAME_BUST',
-    payload: {
-      gameId,
-      who,
-    }
-  }
-}
-
-export function win(gameId, who) {
-  return {
-    type: 'GAME_WIN',
-    payload: {
-      gameId,
-      who,
-    }
-  }
-}

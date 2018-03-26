@@ -112,13 +112,13 @@ class Game extends React.Component {
     return (
       <div>
         <div>
-          <h2>Dealer's Hand</h2>
+          <h2>Dealer&apos;s Hand</h2>
           <Card.Group>
             { dealerCards }
           </Card.Group>
         </div>
         <div>
-          <h2>Player's Hand</h2>
+          <h2>Player&apos;s Hand</h2>
           <Card.Group>
             { playerCards }
           </Card.Group>

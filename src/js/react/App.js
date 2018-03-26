@@ -7,8 +7,7 @@ class App extends React.Component {
   render() {
     return (
       <Switch>
-        <Route exact path="/" component={ Home } />
-        <Route key="game" path="/game" component={ Game } />
+        <Route exact path="/" component={ Game } />
       </Switch>
     )
   }

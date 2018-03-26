@@ -81,8 +81,14 @@ const gameReducer = (state = initialState, action) => {
       const { gameId, who } = action.payload;
 
       const game = state.games[gameId];
+      let nextCard = state.deck.deal();
 
-      game[who].hand.push(state.deck.deal());
+      if (!nextCard) {
+        game.deck = new Deck();
+        nextCard = state.deck.deal();
+      }
+
+      game[who].hand.push(nextCard);
       game[who].score = calculateScore(game[who].hand);
       game[who].bust = didBust(game[who].score);
       game.status = calculateStatus(game);

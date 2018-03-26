@@ -12,6 +12,7 @@ class Deck {
       if (tens.indexOf(card) >= 0) {
         value = 10;
       } else if (card === 'A') {
+        // Technically aces are 11 or 1. However, we handle this difference in calculateScore 
         value = 11;
       } else {
         value = card;
@@ -31,9 +32,12 @@ class Deck {
 
   deal() {
     const deckSize = this.deck.length;
-    const cardIndex = Math.round(Math.random() * deckSize);
+    const cardIndex = Math.floor(Math.random() * deckSize);
+    let card;
 
-    const card = this.deck.splice(cardIndex, 1)[0];
+    if (this.deck[cardIndex]) {
+      card = this.deck.splice(cardIndex, 1)[0];
+    }
 
     return card;
   }

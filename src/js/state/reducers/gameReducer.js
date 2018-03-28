@@ -83,8 +83,8 @@ const gameReducer = (state = initialState, action) => {
       const game = state.games[gameId];
       let nextCard = state.deck.deal();
 
-      if (!nextCard) {
-        game.deck = new Deck();
+      if (nextCard === undefined) {
+        state.deck = new Deck();
         nextCard = state.deck.deal();
       }
 

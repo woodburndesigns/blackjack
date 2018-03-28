@@ -1,9 +1,8 @@
 import { applyMiddleware, createStore, compose } from 'redux';
-import { createLogger } from 'redux-logger';
 import thunk from 'redux-thunk';
 import reducers from './reducers';
 
-let middleware = applyMiddleware(thunk, createLogger());
+let middleware = applyMiddleware(thunk);
 
 if (window.__REDUX_DEVTOOLS_EXTENSION__) {
   middleware = compose(

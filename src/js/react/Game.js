@@ -54,6 +54,16 @@ class Game extends React.Component {
     this.props.dispatch(createGame());
   }
 
+  renderRecommendation() {
+    const game = this.props.game;
+    const dealerScore = game.dealer.score;
+    const playerScore = game.player.score;
+    let jsx;
+
+
+    return jsx;
+  }
+
   renderDealerCards() {
     const game = this.props.game;
     const hand = game.dealer.hand;
@@ -109,6 +119,8 @@ class Game extends React.Component {
     const playerScore = this.renderPlayerScore();
     const dealerScore = this.renderDealerScore();
 
+    const recommendation = this.renderRecommendation();
+
     return (
       <div>
         <div>
@@ -128,10 +140,17 @@ class Game extends React.Component {
           <Button onClick={ this.onStand } disabled={ standDisabled }>Stand</Button>
           <Button onClick={ this.onNewGame } disabled={ newGameDisabled }>New Game</Button>
         </div>
-        <ul>
-          <li>{ playerScore }</li>
-          <li>{ dealerScore }</li>
-        </ul>
+        <div>
+          <h2>Scoring</h2>
+          <ul>
+            <li>{ playerScore }</li>
+            <li>{ dealerScore }</li>
+          </ul>
+        </div>
+        <div>
+          <h2>Recommendations</h2>
+          { recommendation }
+        </div>
       </div>
     )
   }
